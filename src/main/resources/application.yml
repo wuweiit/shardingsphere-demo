@@ -1,0 +1,63 @@
+
+
+# mybatisPlus 相关配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  tenant-enable: false
+  # Maven 多模块项目的扫描路径需以 classpath*: 开头 （即加载多个 jar 包下的 XML 文件）
+  mapper-locations: classpath*:mapper/**/**Mapper.xml
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+#  type-handlers-package:  com.jiayu.yoga.common.data.handler
+
+
+spring:
+  mvc:
+    servlet:
+      load-on-startup: 0
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  shardingsphere:
+    enabled: true
+    mode:
+      type: Memory
+    datasource:
+      names: demods0     #配置库的名字，随意
+      demods0: #配置目前m1库的数据源信息
+        type: com.zaxxer.hikari.HikariDataSource
+        driverClassName: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/demo_ds_0?useUnicode=true
+        username: ${MYSQL_USER}
+        password: ${MYSQL_PWD}
+    rules:
+      sharding:
+        # 公共表。写入时会多数据源写入
+        broadcast-tables:
+        binding-tables:
+        tables:
+          order: # 指定的数据库名
+            actualDataNodes: demods0.t_order_$->{0..1}
+            tableStrategy:
+              standard: # 指定表的分片策略，分片策略包括分片键和分片算法
+                shardingColumn: order_id
+                shardingAlgorithmName: auto-mod
+            keyGenerator: # 指定t_student表的主键生成策略为SNOWFLAKE
+              type: SNOWFLAKE  #主键生成策略为SNOWFLAKE
+              column: order_id  #指定主键
+
+        shardingAlgorithms:
+          auto-mod:
+            type: MOD
+            props:
+              sharding-count: 2
+
+
+    props:
+      sql-show: true
+
+
