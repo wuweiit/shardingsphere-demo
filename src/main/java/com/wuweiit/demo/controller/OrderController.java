@@ -3,6 +3,7 @@ package com.wuweiit.demo.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wuweiit.demo.dao.OrderMapper;
 import com.wuweiit.demo.entity.Order;
 import com.wuweiit.demo.service.OrderService;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,8 @@ public class OrderController     {
      */
     @Resource
     private OrderService orderService;
+    @Resource
+    private OrderMapper orderMapper;
 
 
     /**
@@ -32,6 +35,15 @@ public class OrderController     {
     @PostMapping("/")
     public Object save(@RequestBody Order order) {
         return this.orderService.save(order);
+    }
+
+    /**
+     * 保存
+     * @return 所有数据
+     */
+    @GetMapping("/byId")
+    public Object getById(@RequestParam Long id) {
+        return this.orderMapper.selectById(id);
     }
 
 

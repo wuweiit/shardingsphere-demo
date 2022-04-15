@@ -1,10 +1,8 @@
 package com.wuweiit.demo.entity;
 
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
 /**
@@ -16,9 +14,10 @@ import lombok.Data;
 @SuppressWarnings("serial")
 @Data
 @TableName("`order`")
-public class Order extends Model<Order> {
+public class Order {
 
-    @TableId(type = IdType.ASSIGN_ID)
+    @TableId
+//    @TableId(type = IdType.INPUT)
     private Long orderId;
     
     private Integer userId;

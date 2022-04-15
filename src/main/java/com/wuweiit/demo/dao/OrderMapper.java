@@ -14,7 +14,7 @@ import java.util.List;
  * @since 2022-04-12 13:54:30
  */
 @Mapper
-public interface OrderDao extends BaseMapper<Order> {
+public interface OrderMapper extends BaseMapper<Order> {
 
 /**
 * 批量新增数据（MyBatis原生foreach方法）

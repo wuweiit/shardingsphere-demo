@@ -34,12 +34,12 @@
 			<optional>true</optional>
 		</dependency>
 
-
 		<dependency>
 			<groupId>com.baomidou</groupId>
 			<artifactId>mybatis-plus-boot-starter</artifactId>
 			<version>3.5.1</version>
 		</dependency>
+
 
 
 		<dependency>
@@ -89,6 +89,16 @@
 	</dependencies>
 
 	<build>
+
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

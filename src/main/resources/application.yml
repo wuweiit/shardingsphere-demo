@@ -6,11 +6,12 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
   tenant-enable: false
   # Maven 多模块项目的扫描路径需以 classpath*: 开头 （即加载多个 jar 包下的 XML 文件）
-  mapper-locations: classpath*:mapper/**/**Mapper.xml
+  mapper-locations: classpath*:mapper/**Mapper.xml
   global-config:
     banner: false
     db-config:
       id-type: auto
+#  type-aliases-package: com.wuweiit.demo.entity
 #  type-handlers-package:  com.jiayu.yoga.common.data.handler
 
 
@@ -27,11 +28,17 @@ spring:
     mode:
       type: Memory
     datasource:
-      names: demods0     #配置库的名字，随意
+      names: demods0, demods1    #配置库的名字，随意
       demods0: #配置目前m1库的数据源信息
         type: com.zaxxer.hikari.HikariDataSource
         driverClassName: com.mysql.cj.jdbc.Driver
         url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/demo_ds_0?useUnicode=true
+        username: ${MYSQL_USER}
+        password: ${MYSQL_PWD}
+      demods1: #配置目前m1库的数据源信息
+        type: com.zaxxer.hikari.HikariDataSource
+        driverClassName: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/demo_ds_1?useUnicode=true
         username: ${MYSQL_USER}
         password: ${MYSQL_PWD}
     rules:
@@ -40,21 +47,52 @@ spring:
         broadcast-tables:
         binding-tables:
         tables:
-          order: # 指定的数据库名
+          order2: # 指定的数据库名
             actualDataNodes: demods0.t_order_$->{0..1}
             tableStrategy:
               standard: # 指定表的分片策略，分片策略包括分片键和分片算法
                 shardingColumn: order_id
                 shardingAlgorithmName: auto-mod
             keyGenerator: # 指定t_student表的主键生成策略为SNOWFLAKE
-              type: SNOWFLAKE  #主键生成策略为SNOWFLAKE
+              type: COSID_SNOWFLAKE  #主键生成策略为SNOWFLAKE
               column: order_id  #指定主键
-
+          order: # 指定的数据库名
+            actualDataNodes: demods$->{0..1}.t_order_$->{2021..2025}
+            tableStrategy: # 分表策略
+              standard:
+                shardingColumn: order_id
+                shardingAlgorithmName: time-mod
+            databaseStrategy: # 分库策略
+              standard:
+                shardingColumn: order_id
+                shardingAlgorithmName: time-mod
+            keyGenerateStrategy: # 指定t_student表的主键生成策略为SNOWFLAKE
+              keyGeneratorName: snowflake  #主键生成策略为SNOWFLAKE
+              column: order_id  #指定主键
+        key-generators:
+          snowflake:
+            type: SNOWFLAKE
         shardingAlgorithms:
           auto-mod:
             type: MOD
             props:
               sharding-count: 2
+          # 基于时间与id基因的落库算法
+          time-mod:
+            type: CLASS_BASED
+            props:
+              strategy: STANDARD
+              algorithmClassName: com.wuweiit.demo.shardnig.TimeHashModShardingAlgorithm
+
+              # 数据库的分片个数
+              sharding-count: 2
+              # 基于时间的周期
+              datetime-lower: '2022-01-01 00:00:00'
+              datetime-upper: '2050-12-01 00:00:00'
+              datetime-pattern: "yyyy-MM-dd HH:mm:ss"
+              sharding-suffix-pattern: "yyyy"
+              datetime-interval-amount: 1
+              datetime-interval-unit: years
 
 
     props:
